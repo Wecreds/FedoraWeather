@@ -4,17 +4,13 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        "primary-color": "#798C8C",
-        "secundary-color":"#AEBFBE",
-        "tertiary-color": "tertiary",
-        "white": "#F2EFDF",
+        "primary-color": "#F0F5EF",
         "black": "#161A1E"
       },
     },
     fontFamily: {
       Roboto: ["Roboto, sans-serif"],
     },
-    container
   },
   plugins: [],
 }
