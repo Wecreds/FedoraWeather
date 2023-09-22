@@ -7,6 +7,8 @@
   <div class="pt-4 mb-8 relative text-center">
     <input type="text" class="p-2 bg-gray-100 w-1/2 shadow-xl rounded-sm outline-none focus:border-b-2 focus:border-black focus:shadow-2xl" v-model="campoDePesquisa" @input="FazerPesquisa">
     <ul class="mx-auto bg-gray-100 w-1/2 p-2" v-if="resultadoPesquisa">
+      <p v-if="erroPesquisa">Opa! Algo deu errado, tente novamente.</p>
+      <p v-if="!erroPesquisa && resultadoPesquisa.length === 0">Parece que não encontramos sua cidade, tente outros termos.</p>
       <li v-for="resultado in resultadoPesquisa" :key="resultado.id" class="py-2 cursor-pointer">
       {{resultado.place_name}}
          </li>
@@ -26,14 +28,19 @@ import axios from 'axios';
 const campoDePesquisa = ref("");
 const tempoPesquisa = ref(null);
 const resultadoPesquisa = ref(null);
+const erroPesquisa = ref(null);
 
 const FazerPesquisa = () => {
   clearTimeout(tempoPesquisa.value)
   tempoPesquisa.value = setTimeout(async () => {
     if (campoDePesquisa.value !== ''){
-      const resultado = await axios.get(`https://api.mapbox.com/geocoding/v5/mapbox.places/${campoDePesquisa.value}.json?access_token=pk.eyJ1Ijoid2VjcmVkcyIsImEiOiJjbGdyOTFnNngwZ2pnM3BueWY2bDQ4emk3In0.ERpExZ70zHjb8ekIFwrMvg&types=place&language=pt`)
-      resultadoPesquisa.value = resultado.data.features
-      console.log(resultadoPesquisa.value)
+      try{
+        const data = await axios.get(`https://api.mapbox.com/geocoding/v5/mapbox.places/${campoDePesquisa.value}.json?access_token=pk.eyJ1Ijoid2VjcmVkcyIsImEiOiJjbGdyOTFnNngwZ2pnM3BueWY2bDQ4emk3In0.ERpExZ70zHjb8ekIFwrMvg&types=place&language=pt`)
+        resultadoPesquisa.value = data.data.features
+      } catch {
+        erroPesquisa.value = true;
+      }
+     
       return;
     } else {
       resultadoPesquisa.value = null;
