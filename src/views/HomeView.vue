@@ -10,16 +10,16 @@
   <div class="pt-4 mb-8 relative text-center">
     <input
       type="text"
-      class="p-2 bg-gray-100 w-1/2 shadow-xl rounded-sm outline-none focus:border-b-2 focus:border-black focus:shadow-2xl"
+      class="p-2 bg-gray-200 w-1/2 shadow-xl rounded-sm outline-none focus:border-b-2 focus:border-black focus:shadow-2xl"
       v-model="campoDePesquisa"
       @input="FazerPesquisa"
     />
-    <ul class="mx-auto bg-gray-100 w-1/2 p-2" v-if="resultadoPesquisa">
+    <ul class="mx-auto bg-gray-200 w-1/2 p-2" v-if="resultadoPesquisa">
       <p v-if="erroPesquisa">Opa! Algo deu errado, tente novamente.</p>
       <p v-if="!erroPesquisa && resultadoPesquisa.length === 0">
         Parece que não encontramos sua cidade, tente outros termos.
       </p>
-      <li v-for="resultado in resultadoPesquisa" :key="resultado.id" class="py-2 cursor-pointer">
+      <li v-for="resultado in resultadoPesquisa" :key="resultado.id" class="py-2 cursor-pointer" @click="viewCidade(resultado)">
         {{ resultado.place_name }}
       </li>
     </ul>
@@ -27,16 +27,31 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
-import axios from 'axios'
+import { ref } from 'vue';
+import axios from 'axios';
+import apiConfig from '../../config.js';
 
-import apiConfig from '../../config.js'
+import { useRouter } from 'vue-router';
+const router = useRouter();
+
 
 const mapboxAPIKEY = apiConfig.mapboxAPIKEY
 const campoDePesquisa = ref('')
 const tempoPesquisa = ref(null)
 const resultadoPesquisa = ref(null)
-const erroPesquisa = ref(null)
+const erroPesquisa = ref(null) 
+
+const viewCidade = (resultado) => {
+  const [cidade, estado] = resultado.place_name.split(",");
+  router.push({
+    name: 'cidade',
+    params: {state: estado.replaceAll(" ", ""), city: cidade},
+    query: {
+      lat: resultado.geometry.coordinates[1],
+      lng: resultado.geometry.coordinates[0],
+    }
+  })
+};
 
 const FazerPesquisa = () => {
   clearTimeout(tempoPesquisa.value)
