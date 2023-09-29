@@ -23,6 +23,7 @@
         {{ resultado.place_name }}
       </li>
     </ul>
+    
   </div>
 </template>
 
