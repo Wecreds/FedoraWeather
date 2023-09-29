@@ -11,15 +11,15 @@
     <input
       type="text"
       class="p-2 bg-gray-200 w-1/2 shadow-xl rounded-sm outline-none focus:border-b-2 focus:border-black focus:shadow-2xl"
-      v-model="campoDePesquisa"
+      v-model="searchQuery"
       @input="FazerPesquisa"
     />
-    <ul class="mx-auto bg-gray-200 w-1/2 p-2" v-if="resultadoPesquisa">
-      <p v-if="erroPesquisa">Opa! Algo deu errado, tente novamente.</p>
-      <p v-if="!erroPesquisa && resultadoPesquisa.length === 0">
+    <ul class="mx-auto bg-gray-200 w-1/2 p-2" v-if="queryResult">
+      <p v-if="queryError">Opa! Algo deu errado, tente novamente.</p>
+      <p v-if="!queryError && queryResult.length === 0">
         Parece que não encontramos sua cidade, tente outros termos.
       </p>
-      <li v-for="resultado in resultadoPesquisa" :key="resultado.id" class="py-2 cursor-pointer" @click="viewCidade(resultado)">
+      <li v-for="resultado in queryResult" :key="resultado.id" class="py-2 cursor-pointer" @click="viewCidade(resultado)">
         {{ resultado.place_name }}
       </li>
     </ul>
@@ -30,22 +30,20 @@
 import { ref } from 'vue';
 import axios from 'axios';
 import apiConfig from '../../config.js';
+import { useRouter } from 'vue-router'
 
-import { useRouter } from 'vue-router';
-const router = useRouter();
-
-
+const router = useRouter()
 const mapboxAPIKEY = apiConfig.mapboxAPIKEY
-const campoDePesquisa = ref('')
-const tempoPesquisa = ref(null)
-const resultadoPesquisa = ref(null)
-const erroPesquisa = ref(null) 
+const searchQuery = ref('')
+const queryTimeout = ref(null)
+const queryResult = ref(null)
+const queryError = ref(null) 
 
 const viewCidade = (resultado) => {
-  const [cidade, estado] = resultado.place_name.split(",");
+  const [city, state] = resultado.place_name.split(",");
   router.push({
-    name: 'cidade',
-    params: {state: estado.replaceAll(" ", ""), city: cidade},
+    name: 'city',
+    params: {state: state.replaceAll(" ", ""), city: city},
     query: {
       lat: resultado.geometry.coordinates[1],
       lng: resultado.geometry.coordinates[0],
@@ -54,21 +52,21 @@ const viewCidade = (resultado) => {
 };
 
 const FazerPesquisa = () => {
-  clearTimeout(tempoPesquisa.value)
-  tempoPesquisa.value = setTimeout(async () => {
-    if (campoDePesquisa.value !== '') {
+  clearTimeout(queryTimeout.value)
+  queryTimeout.value = setTimeout(async () => {
+    if (searchQuery.value !== '') {
       try {
         const data = await axios.get(
-          `https://api.mapbox.com/geocoding/v5/mapbox.places/${campoDePesquisa.value}.json?access_token=${mapboxAPIKEY}&types=place&language=pt`
+          `https://api.mapbox.com/geocoding/v5/mapbox.places/${searchQuery.value}.json?access_token=${mapboxAPIKEY}&types=place&language=pt`
         )
-        resultadoPesquisa.value = data.data.features
+        queryResult.value = data.data.features
       } catch {
-        erroPesquisa.value = true
+        queryError.value = true
       }
 
       return
     } else {
-      resultadoPesquisa.value = null
+      queryResult.value = null
     }
   }, 300)
 }
