@@ -14,13 +14,13 @@
       v-model="searchQuery"
       @input="FazerPesquisa"
     />
-    <ul class="mx-auto bg-gray-200 w-1/2 p-2" v-if="queryResult">
+    <ul class="mx-auto bg-gray-200 w-1/2 p-2" v-if="locationStore.queryResult">
       <p v-if="queryError">Opa! Algo deu errado, tente novamente.</p>
-      <p v-if="!queryError && queryResult.length === 0">
+      <p v-else-if="queryResult.length === 0">
         Parece que não encontramos sua cidade, tente outros termos.
       </p>
       <li
-        v-for="resultado in queryResult"
+        v-for="resultado in locationStore.queryResult"
         :key="resultado.id"
         class="py-2 cursor-pointer"
         @click="viewCidade(resultado)"
@@ -33,14 +33,15 @@
 
 <script setup>
 import { ref } from 'vue'
-import axios from 'axios'
 import { useRouter } from 'vue-router'
+import { useLocationStore} from '@/store/locations'
+
 
 const router = useRouter()
-const mapboxAPIKEY = import.meta.env.VITE_MapBoxApiKey
+const locationStore = useLocationStore()
+
 const searchQuery = ref('')
 const queryTimeout = ref(null)
-const queryResult = ref(null)
 const queryError = ref(null)
 
 const viewCidade = (resultado) => {
@@ -60,17 +61,18 @@ const FazerPesquisa = () => {
   queryTimeout.value = setTimeout(async () => {
     if (searchQuery.value !== '') {
       try {
-        const data = await axios.get(
-          `https://api.mapbox.com/geocoding/v5/mapbox.places/${searchQuery.value}.json?access_token=${mapboxAPIKEY}&types=place&language=pt`
-        )
-        queryResult.value = data.data.features
+        await locationStore.getLocations(searchQuery.value)
+        // const data = await axios.get(
+        //   `https://api.mapbox.com/geocoding/v5/mapbox.places/${searchQuery.value}.json?access_token=${mapboxAPIKEY}&types=place&language=pt`
+        // )
+        // queryResult.value = data.data.features
       } catch {
         queryError.value = true
       }
 
       return
     } else {
-      queryResult.value = null
+      // queryResult.value = null
     }
   }, 300)
 }
