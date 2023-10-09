@@ -34,11 +34,10 @@
 <script setup>
 import { ref } from 'vue'
 import axios from 'axios'
-import apiConfig from '../../config.js'
 import { useRouter } from 'vue-router'
 
 const router = useRouter()
-const mapboxAPIKEY = apiConfig.mapboxAPIKEY
+const mapboxAPIKEY = import.meta.env.VITE_MapBoxApiKey
 const searchQuery = ref('')
 const queryTimeout = ref(null)
 const queryResult = ref(null)

@@ -96,9 +96,9 @@
 <script setup>
 import axios from 'axios'
 import { useRoute } from 'vue-router'
-import apiConfig from '../../config.js'
 
-const openweatherAPIKEY = apiConfig.openweatherAPIKEY
+const openweatherAPIKEY = import.meta.env.VITE_OpenWeatherApiKey
+
 const route = useRoute()
 const getWeatherData = async () => {
   try {
