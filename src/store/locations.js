@@ -1,23 +1,24 @@
-import {reactive, computed} from 'vue'
+import { reactive, computed } from 'vue'
 import { defineStore } from 'pinia';
+import axios from 'axios';
 
-export const useLocationStore = defineStore('location', () => {
+export const useSearchFetchStore = defineStore('location', () => {
     const state = reactive({
-        queryResult: []
+        queryResult: null,
     })
     
     const queryResult = computed(() => state.queryResult)
     
-    const getLocation = async (searchText) => {
+    const getLocation = async (searchQuery) => {
         const mapboxAPIKEY = import.meta.env.VITE_MapBoxApiKey
         try {
             const data = await axios.get(
-                `https://api.mapbox.com/geocoding/v5/mapbox.places/${searchText}.json?access_token=${mapboxAPIKEY}&types=place&language=pt`
+                `https://api.mapbox.com/geocoding/v5/mapbox.places/${searchQuery}.json?access_token=${mapboxAPIKEY}&types=place&language=pt`
             )
-            state.queryResult = data.data.feature
+            state.queryResult = data.data.features
             return Promise.resolve(true) 
-        } catch (e) {
-            return Promise.reject(e)
+        } catch (error) {
+            return Promise.reject(error)
         }
     }
 
