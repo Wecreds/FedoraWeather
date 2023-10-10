@@ -5,29 +5,29 @@
         <h1 class="text-4xl mb-2">{{ route.params.city }}</h1>
         <p class="text-sm mb-12">
           {{
-            new Date(weatherData.currentTime).toLocaleDateString('pt-br', {
+            new Date(weatherStore.weatherData.currentTime).toLocaleDateString('pt-br', {
               weekday: 'long',
               day: '2-digit',
               month: 'long'
             })
           }},
           {{
-            new Date(weatherData.currentTime).toLocaleTimeString('pt-br', {
+            new Date(weatherStore.weatherData.currentTime).toLocaleTimeString('pt-br', {
               timeStyle: 'short'
             })
           }}.
         </p>
-        <p class="text-8xl mb-8">{{ Math.round(weatherData.current.temp) }}&deg;C</p>
+        <p class="text-8xl mb-8">{{ Math.round(weatherStore.weatherData.current.temp) }}&deg;C</p>
         <p class="text-center">
           Sensação térmica
-          {{ Math.round(weatherData.current.feels_like) }}&deg;C
+          {{ Math.round(weatherStore.weatherData.current.feels_like) }}&deg;C
         </p>
         <p class="capitalize">
-          {{ weatherData.current.weather[0].description }}
+          {{ weatherStore.weatherData.current.weather[0].description }}
         </p>
         <img
           class="w-[150px] h-auto"
-          :src="`http://openweathermap.org/img/wn/${weatherData.current.weather[0].icon}@2x.png`"
+          :src="`http://openweathermap.org/img/wn/${weatherStore.weatherData.current.weather[0].icon}@2x.png`"
           alt=""
         />
       </div>
@@ -38,7 +38,7 @@
           <h2 class="mb-4">Clima por horário</h2>
           <div class="flex gap-10 overflow-x-scroll">
             <div
-              v-for="hourData in weatherData.hourly"
+              v-for="hourData in weatherStore.weatherData.hourly"
               :key="hourData.dt"
               class="flex flex-col gap-4 items-center"
             >
@@ -64,7 +64,7 @@
       <div class="max-w-screen-md w-full py-12 bg-slate-300 rounded-md shadow-xl m-2">
         <div class="mx-8">
           <h2 class="mb-4">Clima da semana</h2>
-          <div v-for="day in weatherData.daily" :key="day.dt" class="flex items-center">
+          <div v-for="day in weatherStore.weatherData.daily" :key="day.dt" class="flex items-center">
             <p class="flex-1">
               {{
                 new Date(day.dt * 1000).toLocaleDateString('pt-br', {
@@ -95,7 +95,12 @@
 
 <script setup>
 import { useWeatherFetchStore } from '@/stores/weather'
+import { useRoute } from 'vue-router'
 
+const route = useRoute()
+const weatherStore = useWeatherFetchStore()
 
-const weatherData = await useWeatherFetchStore.gerWeatherData
+// eslint-disable-next-line no-unused-vars
+const weatherData = await weatherStore.getWeatherData(route.query.lat, route.query.lng)
+
 </script>

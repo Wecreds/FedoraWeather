@@ -20,12 +20,12 @@
         Parece que não encontramos sua cidade, tente outros termos.
       </p>
       <li
-        v-for="resultado in locationStore.queryResult"
-        :key="resultado.id"
+        v-for="result in locationStore.queryResult"
+        :key="result.id"
         class="py-2 cursor-pointer"
-        @click="viewCidade(resultado)"
+        @click="cityView(result)"
       >
-        {{ resultado.place_name }}
+        {{ result.place_name }}
       </li>
     </ul>
   </div>
@@ -42,14 +42,14 @@ const searchQuery = ref('')
 const queryTimeout = ref(null)
 const queryError = ref(null)
 
-const viewCidade = (resultado) => {
-  const [city, state] = resultado.place_name.split(',')
+const cityView = (result) => {
+  const [city, state] = result.place_name.split(',')
   router.push({
     name: 'city',
     params: { state: state.replaceAll(' ', ''), city: city },
     query: {
-      lat: resultado.geometry.coordinates[1],
-      lng: resultado.geometry.coordinates[0]
+      lat: result.geometry.coordinates[1],
+      lng: result.geometry.coordinates[0]
     }
   })
 }
