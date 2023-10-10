@@ -34,8 +34,7 @@
 <script setup>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { useSearchFetchStore } from '@/store/locations'
-
+import { useSearchFetchStore } from '@/stores/locations'
 
 const router = useRouter()
 const locationStore = useSearchFetchStore()
